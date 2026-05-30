@@ -1,0 +1,47 @@
+benchmark:
+  defaults:
+    request_count: 100
+    concurrency_levels: [1, 5, 10, 25, 50, 100]
+    max_tokens: 256
+    temperature: 0.7
+    timeout_seconds: 120
+    streaming: false
+    warmup_requests: 3
+
+  cold_start:
+    inactivity_seconds: 300
+    measurement_requests: 5
+
+  ttft:
+    min_tokens: 10
+    sample_size: 50
+
+  throughput:
+    duration_seconds: 60
+    ramp_up_seconds: 5
+
+  concurrency:
+    levels: [1, 5, 10, 25, 50, 100]
+    requests_per_level: 50
+    stabilization_seconds: 2
+
+  prompts:
+    short: "Explain the concept of machine learning in one sentence."
+    medium: "Write a detailed explanation of how transformer neural networks work, including attention mechanisms, positional encoding, and the encoder-decoder architecture."
+    long: "You are an AI researcher. Write a comprehensive technical report on the current state of large language models, covering training methodologies, scaling laws, emergent capabilities, alignment challenges, and deployment considerations. Include specific examples and cite recent developments."
+    code: "Write a Python implementation of a binary search tree with insert, search, and delete operations. Include docstrings and type hints."
+
+  retry:
+    max_attempts: 3
+    backoff_factor: 1.5
+    max_wait_seconds: 30
+
+storage:
+  database_url: "sqlite:///data/benchmark_results.db"
+  results_dir: "data"
+  reports_dir: "reports"
+
+logging:
+  level: INFO
+  format: "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+  file: "data/benchmark.log"

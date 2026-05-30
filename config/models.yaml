@@ -1,0 +1,99 @@
+models:
+  - id: meta-llama/Meta-Llama-3.1-8B-Instruct-fast
+    display_name: "Llama 3.1 8B (Fast)"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.06
+      output_per_1m_tokens: 0.06
+    tags: [fast, efficient, small]
+
+  - id: meta-llama/Meta-Llama-3.1-70B-Instruct-fast
+    display_name: "Llama 3.1 70B (Fast)"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.35
+      output_per_1m_tokens: 0.35
+    tags: [fast, large, balanced]
+
+  - id: meta-llama/Meta-Llama-3.1-405B-Instruct
+    display_name: "Llama 3.1 405B"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 3.20
+      output_per_1m_tokens: 3.20
+    tags: [flagship, highest-quality]
+
+  - id: meta-llama/Meta-Llama-3.3-70B-Instruct-fast
+    display_name: "Llama 3.3 70B (Fast)"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.35
+      output_per_1m_tokens: 0.35
+    tags: [fast, large, latest]
+
+  - id: mistralai/Mistral-7B-Instruct-v0.3
+    display_name: "Mistral 7B Instruct"
+    provider: nebius
+    context_length: 32768
+    pricing:
+      input_per_1m_tokens: 0.06
+      output_per_1m_tokens: 0.06
+    tags: [efficient, small]
+
+  - id: mistralai/Mixtral-8x7B-Instruct-v0.1
+    display_name: "Mixtral 8x7B"
+    provider: nebius
+    context_length: 32768
+    pricing:
+      input_per_1m_tokens: 0.45
+      output_per_1m_tokens: 0.45
+    tags: [moe, balanced]
+
+  - id: mistralai/Mixtral-8x22B-Instruct-v0.1
+    display_name: "Mixtral 8x22B"
+    provider: nebius
+    context_length: 65536
+    pricing:
+      input_per_1m_tokens: 0.90
+      output_per_1m_tokens: 0.90
+    tags: [moe, large]
+
+  - id: Qwen/Qwen2.5-72B-Instruct-fast
+    display_name: "Qwen 2.5 72B (Fast)"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.35
+      output_per_1m_tokens: 0.35
+    tags: [fast, multilingual]
+
+  - id: Qwen/Qwen2.5-Coder-32B-Instruct-fast
+    display_name: "Qwen 2.5 Coder 32B (Fast)"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.18
+      output_per_1m_tokens: 0.18
+    tags: [fast, code-specialized]
+
+  - id: deepseek-ai/DeepSeek-V3
+    display_name: "DeepSeek V3"
+    provider: nebius
+    context_length: 131072
+    pricing:
+      input_per_1m_tokens: 0.50
+      output_per_1m_tokens: 1.50
+    tags: [advanced, reasoning]
+
+  - id: custom
+    display_name: "Custom Endpoint"
+    provider: custom
+    context_length: 8192
+    pricing:
+      input_per_1m_tokens: 0.0
+      output_per_1m_tokens: 0.0
+    tags: [custom]
