@@ -10,6 +10,7 @@ from typing import Any, Optional
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from benchmark.auth import get_iam_token
 from benchmark.models import BenchmarkConfig, PromptDataset, RequestMetric
 
 logger = logging.getLogger(__name__)
@@ -37,11 +38,27 @@ class BaseEndpointBenchmark:
         self.config = config
         self._client: Optional[httpx.AsyncClient] = None
 
-    def _build_client(self) -> httpx.AsyncClient:
+    async def _build_client_async(self) -> httpx.AsyncClient:
+        token = await get_iam_token()
         return httpx.AsyncClient(
             base_url=self.config.endpoint_url,
             headers={
-                "Authorization": f"Bearer {self.config.api_key}",
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            timeout=httpx.Timeout(self.config.timeout_seconds),
+            limits=httpx.Limits(max_connections=300, max_keepalive_connections=100),
+        )
+
+    def _build_client(self) -> httpx.AsyncClient:
+        """Sync-compatible builder — token fetched inside async context."""
+        import asyncio
+        token = asyncio.get_event_loop().run_until_complete(get_iam_token()) \
+            if asyncio.get_event_loop().is_running() else asyncio.run(get_iam_token())
+        return httpx.AsyncClient(
+            base_url=self.config.endpoint_url,
+            headers={
+                "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
             },
             timeout=httpx.Timeout(self.config.timeout_seconds),

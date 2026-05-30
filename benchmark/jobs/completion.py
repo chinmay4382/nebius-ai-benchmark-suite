@@ -9,6 +9,7 @@ import uuid
 
 import httpx
 
+from benchmark.auth import get_iam_token
 from benchmark.models import JobBenchmarkConfig, JobMetric
 
 logger = logging.getLogger(__name__)
@@ -23,10 +24,11 @@ class JobCompletionBenchmark:
     def __init__(self, config: JobBenchmarkConfig) -> None:
         self.config = config
 
-    def _build_client(self) -> httpx.AsyncClient:
+    async def _build_client(self) -> httpx.AsyncClient:
+        token = await get_iam_token()
         return httpx.AsyncClient(
             base_url=self.config.base_url,
-            headers={"Authorization": f"Bearer {self.config.api_key}"},
+            headers={"Authorization": f"Bearer {token}"},
             timeout=httpx.Timeout(self.config.timeout_seconds),
         )
 
@@ -99,7 +101,7 @@ class JobCompletionBenchmark:
 
     async def run(self) -> list[JobMetric]:
         metrics: list[JobMetric] = []
-        async with self._build_client() as client:
+        async with await self._build_client() as client:
             for i in range(self.config.job_count):
                 m = await self._full_lifecycle(client, i)
                 metrics.append(m)
