@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NebiusBench Report: {{ run.name }}</title>
+<style>
+  :root {
+    --blue: #00A3FF;
+    --navy: #1C2333;
+    --dark: #0E1117;
+    --card: #141824;
+    --border: #2D3748;
+    --success: #00C896;
+    --warning: #FFB547;
+    --error: #FF4B4B;
+    --text: #E8EAF0;
+    --muted: #8892A4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--dark); color: var(--text);
+    line-height: 1.6; padding: 0;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, #0d1929 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 48px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: rgba(0,163,255,0.1);
+    border: 1px solid rgba(0,163,255,0.3);
+    color: var(--blue);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 1.8rem; font-weight: 800;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .header .meta { color: var(--muted); font-size: 0.85rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 1rem; font-weight: 700;
+    color: var(--blue); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .kpi-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .kpi-value { color: var(--text); font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
+  .kpi-sub { color: var(--muted); font-size: 0.78rem; }
+  table {
+    width: 100%; border-collapse: collapse;
+    background: var(--card); border-radius: 10px;
+    overflow: hidden;
+  }
+  th {
+    background: var(--navy); color: var(--muted);
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 12px 16px;
+    text-align: left; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.9rem; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .good { color: var(--success); font-weight: 600; }
+  .warn { color: var(--warning); font-weight: 600; }
+  .bad  { color: var(--error); font-weight: 600; }
+  .info-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid var(--blue); border-radius: 8px;
+    padding: 14px 18px; margin: 12px 0;
+  }
+  .footer {
+    text-align: center; color: var(--muted); font-size: 0.78rem;
+    padding: 24px; border-top: 1px solid var(--border); margin-top: 40px;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 3px 12px; border-radius: 12px;
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  }
+  .status-completed { background: rgba(0,200,150,0.15); color: var(--success); border: 1px solid var(--success); }
+  .status-failed { background: rgba(255,75,75,0.15); color: var(--error); border: 1px solid var(--error); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">⚡ NebiusBench Report</div>
+  <h1>{{ run.name }}</h1>
+  <div class="meta">
+    Generated: {{ generated_at.strftime('%Y-%m-%d %H:%M UTC') }} &nbsp;·&nbsp;
+    Status: <span class="status-badge status-{{ run.status.value }}">{{ run.status.value }}</span>
+    {% if run.config %}
+    &nbsp;·&nbsp; Model: <strong>{{ run.config.model if hasattr(run.config, 'model') else 'N/A' }}</strong>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- KPIs -->
+  {% if run.endpoint_summary %}
+  {% set s = run.endpoint_summary %}
+  <div class="section">
+    <div class="section-title">Key Performance Indicators</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">TTFT p50</div>
+        <div class="kpi-value">{{ "%.1f"|format(s.ttft.p50) }}</div>
+        <div class="kpi-sub">ms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">TTFT p99</div>
+        <div class="kpi-value">{{ "%.1f"|format(s.ttft.p99) }}</div>
+        <div class="kpi-sub">ms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Throughput</div>
+        <div class="kpi-value">{{ "%.2f"|format(s.throughput_rps) }}</div>
+        <div class="kpi-sub">req/sec</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tokens/sec</div>
+        <div class="kpi-value">{{ "%.0f"|format(s.tokens_per_second) }}</div>
+        <div class="kpi-sub">tok/s</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Error Rate</div>
+        <div class="kpi-value {% if s.error_rate > 0.05 %}bad{% elif s.error_rate > 0.01 %}warn{% else %}good{% endif %}">
+          {{ "%.1f"|format(s.error_rate * 100) }}%
+        </div>
+        <div class="kpi-sub">{{ s.failed_requests }} failed</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Requests</div>
+        <div class="kpi-value">{{ "{:,}".format(s.total_requests) }}</div>
+        <div class="kpi-sub">{{ "%.1f"|format(s.duration_seconds) }}s duration</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latency Table -->
+  <div class="section">
+    <div class="section-title">Latency Percentiles</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th><th>p50</th><th>p90</th><th>p95</th><th>p99</th><th>Mean</th><th>Min</th><th>Max</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>TTFT (ms)</strong></td>
+          <td>{{ "%.1f"|format(s.ttft.p50) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.p90) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.p95) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.p99) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.mean) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.min) }}</td>
+          <td>{{ "%.1f"|format(s.ttft.max) }}</td>
+        </tr>
+        <tr>
+          <td><strong>End-to-End (ms)</strong></td>
+          <td>{{ "%.1f"|format(s.latency.p50) }}</td>
+          <td>{{ "%.1f"|format(s.latency.p90) }}</td>
+          <td>{{ "%.1f"|format(s.latency.p95) }}</td>
+          <td>{{ "%.1f"|format(s.latency.p99) }}</td>
+          <td>{{ "%.1f"|format(s.latency.mean) }}</td>
+          <td>{{ "%.1f"|format(s.latency.min) }}</td>
+          <td>{{ "%.1f"|format(s.latency.max) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cold/Warm Start -->
+  {% if s.cold_start_ms is not none %}
+  <div class="section">
+    <div class="section-title">Cold / Warm Start</div>
+    <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr)">
+      <div class="kpi-card">
+        <div class="kpi-label">Cold Start Latency</div>
+        <div class="kpi-value">{{ "%.0f"|format(s.cold_start_ms) }}</div>
+        <div class="kpi-sub">ms — first request after inactivity</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Warm Start p50</div>
+        <div class="kpi-value">{{ "%.0f"|format(s.warm_start_ms or 0) }}</div>
+        <div class="kpi-sub">ms — steady-state latency</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <!-- Concurrency Sweep -->
+  {% if run.concurrency_results %}
+  <div class="section">
+    <div class="section-title">Concurrency Sweep</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Concurrency</th><th>TTFT p50 (ms)</th><th>TTFT p99 (ms)</th>
+          <th>RPS</th><th>Tokens/sec</th><th>Error Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cr in run.concurrency_results %}
+        <tr>
+          <td><strong>{{ cr.concurrency_level }}</strong></td>
+          <td>{{ "%.1f"|format(cr.summary.ttft.p50) }}</td>
+          <td>{{ "%.1f"|format(cr.summary.ttft.p99) }}</td>
+          <td>{{ "%.2f"|format(cr.summary.throughput_rps) }}</td>
+          <td>{{ "%.1f"|format(cr.summary.tokens_per_second) }}</td>
+          <td class="{% if cr.summary.error_rate > 0.05 %}bad{% elif cr.summary.error_rate > 0.01 %}warn{% else %}good{% endif %}">
+            {{ "%.1f"|format(cr.summary.error_rate * 100) }}%
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Cost -->
+  {% if run.cost_estimate %}
+  {% set c = run.cost_estimate %}
+  <div class="section">
+    <div class="section-title">Cost Estimate</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Cost</div>
+        <div class="kpi-value">${{ "%.6f"|format(c.total_cost_usd) }}</div>
+        <div class="kpi-sub">this benchmark run</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Cost / Request</div>
+        <div class="kpi-value">${{ "%.8f"|format(c.cost_per_request_usd) }}</div>
+        <div class="kpi-sub">USD per request</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Cost / 1M Tokens</div>
+        <div class="kpi-value">${{ "%.4f"|format(c.cost_per_1m_tokens_usd) }}</div>
+        <div class="kpi-sub">blended rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Projected Monthly</div>
+        <div class="kpi-value">${{ "%.2f"|format(c.projected_monthly_cost_usd) }}</div>
+        <div class="kpi-sub">at current rate</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Notes -->
+  {% if run.notes %}
+  <div class="section">
+    <div class="section-title">Notes</div>
+    <div class="info-box">{{ run.notes }}</div>
+  </div>
+  {% endif %}
+
+</div>
+
+<div class="footer">
+  Generated by <strong>NebiusBench v0.1.0</strong> · MIT License · {{ generated_at.strftime('%Y-%m-%d %H:%M UTC') }}
+</div>
+
+</body>
+</html>
