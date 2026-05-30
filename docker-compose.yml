@@ -10,14 +10,17 @@ services:
     container_name: nebiusbench
     ports:
       - "8501:8501"
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=sqlite:////app/data/benchmark_results.db
       - PYTHONPATH=/app
+      # IAM token is auto-fetched from Nebius instance metadata service.
+      # Uncomment only for local dev outside a Nebius VM:
+      # - NEBIUS_API_KEY=your_key_here
     volumes:
       - bench_data:/app/data
       - bench_reports:/app/reports
+      # Mount Nebius VM metadata socket if needed
+      - /run/metadata:/run/metadata:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c",
@@ -27,12 +30,9 @@ services:
       retries: 3
       start_period: 40s
 
-  # Optional: Standalone benchmark runner (CLI mode)
   runner:
     image: nebiusbench:latest
     container_name: nebiusbench-runner
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=sqlite:////app/data/benchmark_results.db
       - PYTHONPATH=/app

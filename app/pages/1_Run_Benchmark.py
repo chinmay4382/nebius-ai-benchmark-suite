@@ -72,13 +72,6 @@ with col_form:
         help="OpenAI-compatible base URL (without /chat/completions)",
     )
 
-    api_key = st.text_input(
-        "API Key",
-        value=os.getenv("NEBIUS_API_KEY", ""),
-        type="password",
-        help="Your Nebius API key. Never stored in the database.",
-    )
-
     models = _load_models()
     model = st.selectbox("Model", models, index=0)
 
@@ -127,16 +120,13 @@ with col_form:
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("")
-    can_run = bool(endpoint_url and api_key and not st.session_state.running)
+    can_run = bool(endpoint_url and not st.session_state.running)
     run_btn = st.button(
         "🚀 Run Benchmark",
         disabled=not can_run,
         use_container_width=True,
         type="primary",
     )
-
-    if not api_key:
-        st.warning("Please enter your Nebius API key to run a benchmark.")
 
 # ─── Benchmark Execution ──────────────────────────────────────────────────────
 with col_results:
@@ -147,7 +137,6 @@ with col_results:
 
         config = BenchmarkConfig(
             endpoint_url=endpoint_url,
-            api_key=api_key,
             model=model,
             concurrency=concurrency,
             request_count=request_count,

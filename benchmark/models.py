@@ -47,7 +47,7 @@ class BenchmarkConfig(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     endpoint_url: str = Field(..., description="OpenAI-compatible API base URL")
-    api_key: str = Field(..., description="API key for authentication")
+    api_key: Optional[str] = Field(default=None, description="API key for local dev — auto-fetched from metadata on Nebius VM")
     model: str = Field(..., description="Model identifier")
     concurrency: int = Field(default=10, ge=1, le=200)
     request_count: int = Field(default=100, ge=1, le=10000)
@@ -71,7 +71,6 @@ class BenchmarkConfig(BaseModel):
 class JobBenchmarkConfig(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    api_key: str
     project_id: str
     folder_id: str
     base_url: str = "https://api.nebius.cloud/v1"
