@@ -80,11 +80,11 @@ graph TD
 
 ```bash
 # 1. Clone
-git clone https://github.com/nebiusbench/nebiusbench
-cd nebiusbench
+git clone https://github.com/chinmay4382/nebius-ai-benchmark-suite
+cd nebius-ai-benchmark-suite
 
 # 2. Install
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 
 # 3. Configure
 cp .env.example .env
